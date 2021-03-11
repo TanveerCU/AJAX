@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AJAX</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .header {
+            background-color: teal;
+            padding: 20px;
+            color: white;
+        }
+
+        .button {
+            display: flex;
+            justify-content: center;
+            padding-top: 30px;
+            padding-bottom: 30px;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            margin-left: 30px;
+            border-radius: 15px;
+            border: 2px solid brown;
+            cursor: pointer;
+        }
+
+        .display {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .data-txt,
+        .data-json,
+        .data-api {
+            flex: 0 0 33.33%;
+            max-width: 33.33%;
+            padding: 40px;
+        }
+
+        .txt,
+        .json,
+        .api {
+            padding-top: 10px;
+        }
+
+        ul {
+            list-style-type: none;
+        }
+
+        .second {
+            padding-left: 20px;
+            line-height: 20px;
+            text-decoration: underline;
+        }
+
+        .third {
+            text-decoration: dotted;
+            padding-left: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>AJAX Basic</h1>
+    </div>
+    <div class="button">
+        <span class="btn btn-text">TEXT DATA</span>
+        <span class="btn btn-json">JSON DATA</span>
+        <span class="btn btn-api">API DATA</span>
+    </div>
+    <div class="display">
+        <div class="data-txt">
+            <h3>Text Data</h3>
+            <hr>
+            <h4 class="txt">nothing to show....</h4>
+        </div>
+        <div class="data-json">
+            <h3>JSON Data</h3>
+            <hr>
+            <h4 class="json">nothing to show....</h4>
+        </div>
+        <div class="data-api">
+            <h3>API Data</h3>
+            <hr>
+            <h4 class="api">nothing to show....</h4>
+        </div>
+    </div>
+    <script>
+        let xhr = new XMLHttpRequest();
+        document.addEventListener('click', (event) => {
+            if (event.target.classList.contains('btn-text')) {
+                //prepare
+                xhr.open('GET', "text.txt", true);
+                //send
+                xhr.send();
+                //process and response
+                xhr.onload = () => {
+                    if (xhr.status === 200) {
+                        let data = xhr.responseText
+                        displayText(data);
+
+                    } else {
+                        let data = "error";
+                        displayText(data);
+                    }
+                }
+            }
+            if (event.target.classList.contains("btn-json")) {
+                //prepare
+                xhr.open('GET', "user.json", true);
+                //send
+                xhr.send();
+                //process and response
+                xhr.onload = () => {
+                    if (xhr.status === 200) {
+                        let data = xhr.responseText
+                        displayJSON(JSON.parse(data));
+
+                    } else {
+                        let data = "error";
+                        displayText(data);
+                    }
+                }
+            }
+            if (event.target.classList.contains("btn-api")) {
+                //prepare
+                xhr.open('GET', "https://jsonplaceholder.typicode.com/users", true);
+                //send
+                xhr.send();
+                //process and response
+                xhr.onload = () => {
+                    if (xhr.status === 200) {
+                        let data = xhr.responseText
+                        displayAPI(JSON.parse(data));
+
+                    } else {
+                        let data = "error";
+                        displayText(data);
+                    }
+                }
+            }
+        });
+
+
+        function displayText(data) {
+            document.getElementsByClassName('txt')[0].innerHTML = data;
+        }
+
+        function displayJSON(data) {
+            let dataArr = ['<ul>'];
+            for (x in data) {
+                let str = x + ": " + data[x];
+                dataArr.push(`<li>${str}</li>`);
+            }
+            dataArr.push('</ul>');
+            let str = dataArr.toLocaleString();
+            str = str.replace(/,/g, " ");
+
+            document.getElementsByClassName('json')[0].innerHTML = str;
+        }
+
+        function displayAPI(data) {
+            let i = 0;
+            let dataArr = ['<ul>'];
+            for (x in data) {
+                for (y in data[x]) {
+                    if (y == "id" && i > 0) {
+                        dataArr.push("<br><br><br>");
+                    }
+                    if (typeof (data[x][y]) === 'object') {
+                        let dt = `<li>${y}:</li>`;
+                        dataArr.push(dt);
+                        dataArr.push("<ul class = 'second'>");
+                        for (z in data[x][y]) {
+                            if (typeof (data[x][y][z]) === 'object') {
+                                let innerdata = `<li>${z}:</li>`;
+                                dataArr.push(innerdata);
+                                dataArr.push("<ul class = 'third'>");
+                                for (w in data[x][y][z]) {
+                                    let innerdata = `<li>${w}: ${data[x][y][z][w]}</li>`;
+                                    dataArr.push(innerdata);
+                                }
+                                dataArr.push("</ul>");
+                            } else {
+                                let innerdata = `<li>${z}: ${data[x][y][z]}</li>`;
+                                dataArr.push(innerdata);
+                            }
+                        }
+                        dataArr.push("</ul>");
+
+                    } else {
+                        let dt = `<li>${y}: ${data[x][y]}</li>`;
+                        dataArr.push(dt);
+                    }
+                    i++;
+                }
+            }
+            dataArr.push("</ul>");
+            let k = dataArr.toString();
+            k = k.replace(/,/g, " ");
+            document.getElementsByClassName('api')[0].innerHTML = k;
+        }
+    </script>
+</body>
+
+</html>
